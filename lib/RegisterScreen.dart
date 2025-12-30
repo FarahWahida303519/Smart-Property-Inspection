@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:smart_property_inspection/LoginScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_property_inspection/LoginScreen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -12,10 +12,12 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen>
     with SingleTickerProviderStateMixin {
 
-  TextEditingController usernameController = TextEditingController();
+  final TextEditingController usernameController = TextEditingController();
 
   late AnimationController _controller;
   late Animation<double> _fadeIn;
+
+  static const Color bgDarkBlue = Color(0xFF2F3E46);
 
   @override
   void initState() {
@@ -45,7 +47,7 @@ class _RegisterScreenState extends State<RegisterScreen>
     final double width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: bgDarkBlue,
       body: FadeTransition(
         opacity: _fadeIn,
         child: Center(
@@ -57,9 +59,9 @@ class _RegisterScreenState extends State<RegisterScreen>
               borderRadius: BorderRadius.circular(16),
               boxShadow: const [
                 BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 10,
-                  offset: Offset(0, 4),
+                  color: Colors.black26,
+                  blurRadius: 12,
+                  offset: Offset(0, 6),
                 ),
               ],
             ),
@@ -69,9 +71,8 @@ class _RegisterScreenState extends State<RegisterScreen>
                 const Icon(
                   Icons.person_add_alt_1,
                   size: 60,
-                  color: Color(0xFF2F3E46),
+                  color: bgDarkBlue,
                 ),
-
                 const SizedBox(height: 16),
 
                 const Text(
@@ -79,24 +80,18 @@ class _RegisterScreenState extends State<RegisterScreen>
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF2F3E46),
+                    color: bgDarkBlue,
                   ),
                 ),
-
                 const SizedBox(height: 6),
 
                 const Text(
                   "This username will be used for property inspections",
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.black54,
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(color: Colors.black54),
                 ),
-
                 const SizedBox(height: 24),
 
-                // USERNAME FIELD (same logic as before)
                 TextField(
                   controller: usernameController,
                   decoration: InputDecoration(
@@ -106,16 +101,15 @@ class _RegisterScreenState extends State<RegisterScreen>
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 20),
 
-                // SAVE BUTTON (same logic as savePin)
                 SizedBox(
                   width: double.infinity,
                   height: 48,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF4CAF50),
+                      foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -126,6 +120,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -144,7 +139,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                   },
                   child: const Text(
                     "Back to Login",
-                    style: TextStyle(color: Color(0xFF2F3E46)),
+                    style: TextStyle(color: bgDarkBlue),
                   ),
                 ),
               ],
@@ -155,7 +150,7 @@ class _RegisterScreenState extends State<RegisterScreen>
     );
   }
 
-  // SAME LOGIC AS savePin(), JUST RENAMED
+  // RESET LOGIN STATE AFTER REGISTER
   Future<void> saveUsername() async {
     String username = usernameController.text.trim();
 
@@ -166,20 +161,18 @@ class _RegisterScreenState extends State<RegisterScreen>
 
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('username', username);
+    await prefs.setBool('isLoggedIn', false);
 
     if (mounted) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (_) => const LoginScreen(),
-        ),
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
       );
     }
   }
 
   void showSnack(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg)),
-    );
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(msg)));
   }
 }

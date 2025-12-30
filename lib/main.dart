@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:smart_property_inspection/loginscreen.dart';
+import 'package:smart_property_inspection/LoginScreen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -40,6 +40,8 @@ class _SplashScreenState extends State<SplashScreen>
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
 
+  static const Color bgDarkBlue = Color(0xFF2F3E46);
+
   @override
   void initState() {
     super.initState();
@@ -49,10 +51,7 @@ class _SplashScreenState extends State<SplashScreen>
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(
+    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
 
@@ -82,53 +81,57 @@ class _SplashScreenState extends State<SplashScreen>
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: bgDarkBlue, // 🔥 dark background
       body: Center(
         child: FadeTransition(
           opacity: _fadeAnimation,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // LOGO CIRCLE
               Container(
                 height: screenHeight * 0.18,
                 width: screenHeight * 0.18,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: const Color(0xFF2F3E46).withOpacity(0.1),
+                  color: Colors.white.withOpacity(0.15),
                 ),
                 child: const Icon(
                   Icons.home_work,
                   size: 90,
-                  color: Color(0xFF2F3E46),
+                  color: Colors.white, // 🔥 light logo
                 ),
               ),
 
               const SizedBox(height: 30),
 
+              // APP TITLE
               const Text(
                 "Smart Property Inspection",
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF2F3E46),
+                  color: Colors.white, // 🔥 white text
                 ),
               ),
 
               const SizedBox(height: 10),
 
+              // SUBTITLE
               const Text(
                 "Record inspections efficiently",
                 style: TextStyle(
                   fontSize: 15,
-                  color: Colors.black54,
+                  color: Colors.white70,
                 ),
               ),
 
               const SizedBox(height: 35),
 
+              // LOADING INDICATOR
               const CircularProgressIndicator(
                 strokeWidth: 3,
-                color: Color(0xFF4CAF50),
+                color: Color(0xFF4CAF50), // green accent
               ),
             ],
           ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-//import 'package:smart_property_inspection/mainscreen.dart';
-import 'package:smart_property_inspection/registerscreen.dart';
+import 'package:smart_property_inspection/RegisterScreen.dart';
+import 'package:smart_property_inspection/HomePage.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -19,7 +19,9 @@ class _LoginScreenState extends State<LoginScreen>
   late Animation<double> _fade;
 
   bool prefsLoaded = false;
-  String username = "";
+  String storedUsername = "";
+
+  static const Color bgDarkBlue = Color(0xFF2F3E46);
 
   @override
   void initState() {
@@ -39,16 +41,16 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  // LOAD SESSION (AUTO LOGIN)
+  // AUTO LOGIN
   Future<void> _loadPrefs() async {
     final prefs = await SharedPreferences.getInstance();
-    username = prefs.getString('username') ?? "";
+    storedUsername = prefs.getString('username') ?? "";
     bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
 
-    if (isLoggedIn && username.isNotEmpty) {
+    if (isLoggedIn && storedUsername.isNotEmpty) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const MainScreen()),
+        MaterialPageRoute(builder: (_) => const Home()),
       );
     } else {
       setState(() => prefsLoaded = true);
@@ -74,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen>
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: bgDarkBlue,
       body: FadeTransition(
         opacity: _fade,
         child: Center(
@@ -86,9 +88,9 @@ class _LoginScreenState extends State<LoginScreen>
               borderRadius: BorderRadius.circular(16),
               boxShadow: const [
                 BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 10,
-                  offset: Offset(0, 4),
+                  color: Colors.black26,
+                  blurRadius: 12,
+                  offset: Offset(0, 6),
                 ),
               ],
             ),
@@ -98,9 +100,8 @@ class _LoginScreenState extends State<LoginScreen>
                 const Icon(
                   Icons.home_work,
                   size: 60,
-                  color: Color(0xFF2F3E46),
+                  color: bgDarkBlue,
                 ),
-
                 const SizedBox(height: 16),
 
                 const Text(
@@ -108,21 +109,18 @@ class _LoginScreenState extends State<LoginScreen>
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF2F3E46),
+                    color: bgDarkBlue,
                   ),
                   textAlign: TextAlign.center,
                 ),
-
                 const SizedBox(height: 6),
 
                 const Text(
-                  "Enter your username to continue",
+                  "Login using your registered username",
                   style: TextStyle(color: Colors.black54),
                 ),
-
                 const SizedBox(height: 24),
 
-                // USERNAME FIELD
                 TextField(
                   controller: usernameController,
                   decoration: InputDecoration(
@@ -132,7 +130,6 @@ class _LoginScreenState extends State<LoginScreen>
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 20),
 
                 // LOGIN BUTTON
@@ -142,6 +139,7 @@ class _LoginScreenState extends State<LoginScreen>
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF4CAF50),
+                      foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -159,7 +157,24 @@ class _LoginScreenState extends State<LoginScreen>
 
                 const SizedBox(height: 14),
 
-               
+                // 🔽 SIMPLE TEXT BUTTON (MATCH REGISTER STYLE)
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const RegisterScreen(),
+                      ),
+                    );
+                  },
+                  child: const Text(
+                    "Register / Set Username",
+                    style: TextStyle(
+                      color: bgDarkBlue,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -168,25 +183,38 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  // LOGIN HANDLER (SAME LOGIC PURPOSE)
+  // SINGLE USER LOGIN VALIDATION
   Future<void> _handleLogin() async {
-    if (usernameController.text.trim().isEmpty) {
+    String inputUsername = usernameController.text.trim();
+
+    if (inputUsername.isEmpty) {
       _showMessage("Please enter username");
       return;
     }
 
     final prefs = await SharedPreferences.getInstance();
+    String savedUsername = prefs.getString('username') ?? "";
+
+    if (savedUsername.isEmpty) {
+      _showMessage("No user registered. Please register first.");
+      return;
+    }
+
+    if (inputUsername != savedUsername) {
+      _showMessage("Username does not match registered user");
+      return;
+    }
+
     await prefs.setBool('isLoggedIn', true);
 
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => const MainScreen()),
+      MaterialPageRoute(builder: (_) => const Home()),
     );
   }
- 
+
   void _showMessage(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg)),
-    );
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(msg)));
   }
 }
