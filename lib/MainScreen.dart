@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:smart_property_inspection/InspectionForm.dart';
+import 'package:smart_property_inspection/InspectionDetailScreen.dart';
 import 'package:smart_property_inspection/databasehelper.dart';
 import 'package:smart_property_inspection/inspectiondata.dart';
-
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -14,7 +14,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   List<InspectionData> inspectionList = [];
-  TextEditingController searchController = TextEditingController();
+  final TextEditingController searchController = TextEditingController();
 
   bool isSearching = false;
   int limit = 20;
@@ -29,7 +29,7 @@ class _MainScreenState extends State<MainScreen> {
   Future<void> loadData() async {
     inspectionList =
         await DatabaseHelper().getMyListsPaginated(limit, 0);
-    setState(() {});
+    if (mounted) setState(() {});
   }
 
   // ================= DELETE DIALOG =================
@@ -67,7 +67,7 @@ class _MainScreenState extends State<MainScreen> {
         content: TextField(
           controller: searchController,
           decoration: const InputDecoration(
-            hintText: "Property name or description",
+            hintText: "Property name, address or description",
           ),
         ),
         actions: [
@@ -83,8 +83,10 @@ class _MainScreenState extends State<MainScreen> {
               inspectionList =
                   await DatabaseHelper().searchMyList(keyword);
 
-              setState(() => isSearching = true);
-              Navigator.pop(context);
+              if (mounted) {
+                setState(() => isSearching = true);
+                Navigator.pop(context);
+              }
             },
             child: const Text("Search"),
           ),
@@ -190,16 +192,18 @@ class _MainScreenState extends State<MainScreen> {
 
                         return GestureDetector(
                           onTap: () async {
-                            await Navigator.push(
+                            final result = await Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) =>
-                                    const InspectionFormPage(),
-                                settings:
-                                    RouteSettings(arguments: item),
+                                builder: (_) => InspectionDetailScreen(
+                                  inspection: item,
+                                ),
                               ),
                             );
-                            loadData();
+
+                            if (result == true) {
+                              loadData();
+                            }
                           },
                           child: _inspectionCard(item),
                         );
@@ -270,7 +274,7 @@ class _MainScreenState extends State<MainScreen> {
                               icon: const Icon(Icons.delete,
                                   size: 18, color: Colors.red),
                               onPressed: () =>
-                                  deleteDialog(item.id!), // ✅ FIX
+                                  deleteDialog(item.id),
                             ),
                           ],
                         ),
