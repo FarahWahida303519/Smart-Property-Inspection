@@ -2,9 +2,10 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:smart_property_inspection/inspectiondata.dart';
 
+
 class DatabaseHelper {
   static const _databaseName = "propertyinspector.db";
-  static const _databaseVersion = 1;
+  static const _databaseVersion = 2;
   static const tablename = 'tbl_inspections';
 
   DatabaseHelper._internal();
@@ -14,14 +15,12 @@ class DatabaseHelper {
 
   static Database? _db;
 
-  // DATABASE INITIALIZATION
   Future<Database> get database async {
     if (_db != null) return _db!;
     _db = await _initDb();
     return _db!;
   }
 
-  // INITIALIZE DATABASE
   Future<Database> _initDb() async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, _databaseName);
@@ -34,6 +33,7 @@ class DatabaseHelper {
           CREATE TABLE $tablename (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             property_name TEXT,
+            address TEXT,
             description TEXT,
             rating TEXT,
             latitude REAL,
@@ -46,46 +46,15 @@ class DatabaseHelper {
     );
   }
 
-  // INSERT INSPECTION RECORD
   Future<int> insertMyList(InspectionData inspection) async {
     final db = await database;
     final data = inspection.toMap();
-    data.remove('id'); // auto increment
+    data.remove('id');
     return await db.insert(tablename, data);
   }
 
-  // READ RECORDS WITH PAGINATION
-  Future<List<InspectionData>> getMyListsPaginated(
-      int limit, int offset) async {
-    final db = await database;
-
-    final result = await db.query(
-      tablename,
-      orderBy: 'date_created DESC, id DESC',
-      limit: limit,
-      offset: offset,
-    );
-
-    return result.map((e) => InspectionData.fromMap(e)).toList();
-  }
-
-  // READ RECORD BY ID
-  Future<InspectionData?> getMyListById(int id) async {
-    final db = await database;
-
-    final result =
-        await db.query(tablename, where: 'id = ?', whereArgs: [id]);
-
-    if (result.isNotEmpty) {
-      return InspectionData.fromMap(result.first);
-    }
-    return null;
-  }
-
-  // UPDATE RECORD
   Future<int> updateMyList(InspectionData inspection) async {
     final db = await database;
-
     return await db.update(
       tablename,
       inspection.toMap(),
@@ -94,7 +63,6 @@ class DatabaseHelper {
     );
   }
 
-  // DELETE RECORD
   Future<int> deleteMyList(int id) async {
     final db = await database;
     return await db.delete(
@@ -104,23 +72,27 @@ class DatabaseHelper {
     );
   }
 
-  // SEARCH RECORDS
-  Future<List<InspectionData>> searchMyList(String keyword) async {
+  Future<List<InspectionData>> getMyListsPaginated(
+      int limit, int offset) async {
     final db = await database;
-
     final result = await db.query(
       tablename,
-      where: 'property_name LIKE ? OR description LIKE ?',
-      whereArgs: ['%$keyword%', '%$keyword%'],
-      orderBy: 'date_created DESC',
+      orderBy: 'date_created DESC, id DESC',
+      limit: limit,
+      offset: offset,
     );
-
     return result.map((e) => InspectionData.fromMap(e)).toList();
   }
 
-  // CLOSE DATABASE
-  Future<void> closeDb() async {
+  Future<List<InspectionData>> searchMyList(String keyword) async {
     final db = await database;
-    await db.close();
+    final result = await db.query(
+      tablename,
+      where:
+          'property_name LIKE ? OR address LIKE ? OR description LIKE ?',
+      whereArgs: ['%$keyword%', '%$keyword%', '%$keyword%'],
+      orderBy: 'date_created DESC',
+    );
+    return result.map((e) => InspectionData.fromMap(e)).toList();
   }
 }

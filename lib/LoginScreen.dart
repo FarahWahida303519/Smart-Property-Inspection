@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_property_inspection/RegisterScreen.dart';
-import 'package:smart_property_inspection/HomePage.dart';
+import 'package:smart_property_inspection/MainScreen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -50,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen>
     if (isLoggedIn && storedUsername.isNotEmpty) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const Home()),
+        MaterialPageRoute(builder: (_) => const MainScreen()),
       );
     } else {
       setState(() => prefsLoaded = true);
@@ -209,7 +209,7 @@ class _LoginScreenState extends State<LoginScreen>
 
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => const Home()),
+      MaterialPageRoute(builder: (_) => const MainScreen()),
     );
   }
 

@@ -1,8 +1,14 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_property_inspection/LoginScreen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // 🔴 IMPORTANT: reset login state so LoginScreen is shown
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setBool('isLoggedIn', false);
+
   runApp(const MyApp());
 }
 
@@ -26,7 +32,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// SPLASH SCREEN
+// ================= SPLASH SCREEN =================
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -59,14 +65,14 @@ class _SplashScreenState extends State<SplashScreen>
 
     // SPLASH DELAY → LOGIN SCREEN
     Future.delayed(const Duration(seconds: 4), () {
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => const LoginScreen(),
-          ),
-        );
-      }
+      if (!mounted) return;
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const LoginScreen(),
+        ),
+      );
     });
   }
 
@@ -81,14 +87,14 @@ class _SplashScreenState extends State<SplashScreen>
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: bgDarkBlue, // 🔥 dark background
+      backgroundColor: bgDarkBlue,
       body: Center(
         child: FadeTransition(
           opacity: _fadeAnimation,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // LOGO CIRCLE
+              // LOGO
               Container(
                 height: screenHeight * 0.18,
                 width: screenHeight * 0.18,
@@ -99,19 +105,19 @@ class _SplashScreenState extends State<SplashScreen>
                 child: const Icon(
                   Icons.home_work,
                   size: 90,
-                  color: Colors.white, // 🔥 light logo
+                  color: Colors.white,
                 ),
               ),
 
               const SizedBox(height: 30),
 
-              // APP TITLE
+              // TITLE
               const Text(
                 "Smart Property Inspection",
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white, // 🔥 white text
+                  color: Colors.white,
                 ),
               ),
 
@@ -128,10 +134,10 @@ class _SplashScreenState extends State<SplashScreen>
 
               const SizedBox(height: 35),
 
-              // LOADING INDICATOR
+              // LOADING
               const CircularProgressIndicator(
                 strokeWidth: 3,
-                color: Color(0xFF4CAF50), // green accent
+                color: Color(0xFF4CAF50),
               ),
             ],
           ),

@@ -1,18 +1,16 @@
 class InspectionData {
-  int id;
+  int? id;
   String propertyName;
-  String address;
   String description;
   String rating;
   double latitude;
   double longitude;
   String dateCreated;
-  String photos;
+  String photos; // comma-separated or JSON string
 
   InspectionData(
     this.id,
     this.propertyName,
-    this.address,
     this.description,
     this.rating,
     this.latitude,
@@ -21,11 +19,11 @@ class InspectionData {
     this.photos,
   );
 
+  // Convert object to Map for SQLite
   Map<String, dynamic> toMap() {
     return {
       'id': id,
       'property_name': propertyName,
-      'address': address,
       'description': description,
       'rating': rating,
       'latitude': latitude,
@@ -35,11 +33,11 @@ class InspectionData {
     };
   }
 
+  // Create object from SQLite Map
   factory InspectionData.fromMap(Map<String, dynamic> map) {
     return InspectionData(
-      map['id'] as int,
+      map['id'] as int?,
       map['property_name'] as String,
-      map['address'] as String,
       map['description'] as String,
       map['rating'] as String,
       map['latitude'] as double,
