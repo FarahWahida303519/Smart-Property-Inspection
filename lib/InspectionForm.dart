@@ -1,12 +1,12 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:intl/intl.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:smart_property_inspection/databasehelper.dart';
 import 'package:smart_property_inspection/inspectiondata.dart';
-
 
 class InspectionFormPage extends StatefulWidget {
   const InspectionFormPage({super.key});
@@ -35,7 +35,7 @@ class _InspectionFormPageState extends State<InspectionFormPage> {
     super.initState();
     dateCreated =
         DateFormat("dd MMM yyyy, hh:mm a").format(DateTime.now());
-    _getLocation();
+    _getLocation(); // ✅ device GPS
   }
 
   @override
@@ -56,7 +56,9 @@ class _InspectionFormPageState extends State<InspectionFormPage> {
 
       images.clear();
       for (String path in args.photos.split(",")) {
-        if (path.isNotEmpty) images.add(File(path));
+        if (path.trim().isNotEmpty) {
+          images.add(File(path));
+        }
       }
     }
   }
@@ -75,6 +77,8 @@ class _InspectionFormPageState extends State<InspectionFormPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+
+            // PROPERTY NAME
             TextField(
               controller: nameController,
               decoration: const InputDecoration(
@@ -82,7 +86,10 @@ class _InspectionFormPageState extends State<InspectionFormPage> {
                 prefixIcon: Icon(Icons.home),
               ),
             ),
+
             const SizedBox(height: 12),
+
+            // ADDRESS
             TextField(
               controller: addressController,
               decoration: const InputDecoration(
@@ -90,13 +97,20 @@ class _InspectionFormPageState extends State<InspectionFormPage> {
                 prefixIcon: Icon(Icons.location_city),
               ),
             ),
+
             const SizedBox(height: 8),
+
+            // GPS DISPLAY
             Text(
               latitude == null
                   ? "Detecting GPS location..."
                   : "GPS: $latitude , $longitude",
+              style: const TextStyle(color: Colors.black54),
             ),
+
             const SizedBox(height: 16),
+
+            // DESCRIPTION
             TextField(
               controller: descriptionController,
               maxLines: 4,
@@ -104,7 +118,10 @@ class _InspectionFormPageState extends State<InspectionFormPage> {
                 labelText: "Inspection Description",
               ),
             ),
+
             const SizedBox(height: 16),
+
+            // RATING
             DropdownButtonFormField<String>(
               value: rating,
               decoration: const InputDecoration(
@@ -118,10 +135,15 @@ class _InspectionFormPageState extends State<InspectionFormPage> {
               ],
               onChanged: (val) => setState(() => rating = val!),
             ),
+
             const SizedBox(height: 16),
+
+            // PHOTOS
             Text("Photos (${images.length}/3 minimum)"),
+            const SizedBox(height: 6),
             Wrap(
               spacing: 8,
+              runSpacing: 8,
               children: images
                   .map((img) => Image.file(
                         img,
@@ -131,12 +153,18 @@ class _InspectionFormPageState extends State<InspectionFormPage> {
                       ))
                   .toList(),
             ),
+
+            const SizedBox(height: 8),
+
             ElevatedButton.icon(
-              onPressed: () => addImage(ImageSource.camera),
-              icon: const Icon(Icons.camera_alt),
+              onPressed: showImageSourceDialog,
+              icon: const Icon(Icons.add_a_photo),
               label: const Text("Add Photo"),
             ),
+
             const SizedBox(height: 20),
+
+            // SAVE
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -150,11 +178,11 @@ class _InspectionFormPageState extends State<InspectionFormPage> {
     );
   }
 
-  // ================= METHODS =================
-
+  // ================= GPS =================
   Future<void> _getLocation() async {
     LocationPermission permission =
         await Geolocator.requestPermission();
+
     if (permission == LocationPermission.denied ||
         permission == LocationPermission.deniedForever) return;
 
@@ -167,13 +195,55 @@ class _InspectionFormPageState extends State<InspectionFormPage> {
     });
   }
 
-  Future<void> addImage(ImageSource source) async {
+  // ================= IMAGE PICK & CROP =================
+  void showImageSourceDialog() {
+    showModalBottomSheet(
+      context: context,
+      builder: (_) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: const Icon(Icons.camera_alt),
+            title: const Text("Camera"),
+            onTap: () {
+              Navigator.pop(context);
+              pickAndCrop(ImageSource.camera);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.photo),
+            title: const Text("Gallery"),
+            onTap: () {
+              Navigator.pop(context);
+              pickAndCrop(ImageSource.gallery);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> pickAndCrop(ImageSource source) async {
     final picked = await picker.pickImage(source: source);
-    if (picked != null) {
-      setState(() => images.add(File(picked.path)));
+    if (picked == null) return;
+
+    final cropped = await ImageCropper().cropImage(
+      sourcePath: picked.path,
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: "Crop Image",
+          toolbarColor: const Color(0xFF52796F),
+          toolbarWidgetColor: Colors.white,
+        ),
+      ],
+    );
+
+    if (cropped != null) {
+      setState(() => images.add(File(cropped.path)));
     }
   }
 
+  // ================= SAVE =================
   Future<void> saveInspection() async {
     if (nameController.text.trim().isEmpty ||
         addressController.text.trim().isEmpty ||

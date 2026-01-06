@@ -24,6 +24,12 @@ class _InspectionDetailScreenState extends State<InspectionDetailScreen> {
         .where((path) => path.trim().isNotEmpty)
         .toList();
 
+    // split description into lines
+    final descLines = widget.inspection.description
+        .split('\n')
+        .where((line) => line.trim().isNotEmpty)
+        .toList();
+
     return Scaffold(
       backgroundColor: const Color(0xFFF2F4F3),
       appBar: AppBar(
@@ -99,17 +105,39 @@ class _InspectionDetailScreenState extends State<InspectionDetailScreen> {
 
             const SizedBox(height: 24),
 
-            // ================= DESCRIPTION =================
+            // ================= DESCRIPTION (IMPROVED) =================
             const Text(
               "Inspection Description",
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             _card(
-              Text(
-                widget.inspection.description,
-                style:
-                    const TextStyle(fontSize: 14, height: 1.6),
+              Column(
+                children: descLines.map((text) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(
+                          Icons.check_circle,
+                          size: 18,
+                          color: Color(0xFF52796F),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            text,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              height: 1.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
               ),
             ),
 
