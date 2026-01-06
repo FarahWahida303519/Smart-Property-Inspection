@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:smart_property_inspection/databasehelper.dart';
 import 'package:smart_property_inspection/inspectiondata.dart';
@@ -16,7 +17,6 @@ class InspectionDetailScreen extends StatefulWidget {
 }
 
 class _InspectionDetailScreenState extends State<InspectionDetailScreen> {
-
   @override
   Widget build(BuildContext context) {
     final photos = widget.inspection.photos
@@ -24,7 +24,6 @@ class _InspectionDetailScreenState extends State<InspectionDetailScreen> {
         .where((path) => path.trim().isNotEmpty)
         .toList();
 
-    // split description into lines
     final descLines = widget.inspection.description
         .split('\n')
         .where((line) => line.trim().isNotEmpty)
@@ -33,8 +32,15 @@ class _InspectionDetailScreenState extends State<InspectionDetailScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF2F4F3),
       appBar: AppBar(
-        title: const Text("Inspection Details"),
+        title: const Text(
+          "Inspection Details",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         backgroundColor: const Color(0xFF52796F),
+        iconTheme: const IconThemeData(color: Colors.white),
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -42,7 +48,6 @@ class _InspectionDetailScreenState extends State<InspectionDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             // ================= PROPERTY INFO =================
             _card(
               Column(
@@ -64,8 +69,15 @@ class _InspectionDetailScreenState extends State<InspectionDetailScreen> {
                     ),
                   ),
                   const SizedBox(height: 14),
-                  _infoRow(Icons.access_time,
-                      widget.inspection.dateCreated),
+
+                  // ✅ DATE FORMATTED HERE
+                  _infoRow(
+                    Icons.access_time,
+                    DateFormat("dd MMM yyyy, hh:mm a")
+                        .format(DateTime.parse(
+                            widget.inspection.dateCreated)),
+                  ),
+
                   const SizedBox(height: 6),
                   _infoRow(
                     Icons.location_on,
@@ -105,10 +117,11 @@ class _InspectionDetailScreenState extends State<InspectionDetailScreen> {
 
             const SizedBox(height: 24),
 
-            // ================= DESCRIPTION (IMPROVED) =================
+            // ================= DESCRIPTION =================
             const Text(
               "Inspection Description",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              style:
+                  TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             _card(
@@ -143,10 +156,11 @@ class _InspectionDetailScreenState extends State<InspectionDetailScreen> {
 
             const SizedBox(height: 28),
 
-            // ================= PHOTOS (VERTICAL LIST) =================
+            // ================= PHOTOS =================
             const Text(
               "Inspection Photos",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              style:
+                  TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 12),
 
@@ -194,8 +208,8 @@ class _InspectionDetailScreenState extends State<InspectionDetailScreen> {
                       ),
                     ),
                     style: OutlinedButton.styleFrom(
-                      side:
-                          const BorderSide(color: Color(0xFF52796F)),
+                      side: const BorderSide(
+                          color: Color(0xFF52796F)),
                       padding:
                           const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
@@ -327,7 +341,7 @@ class _InspectionDetailScreenState extends State<InspectionDetailScreen> {
             onPressed: () async {
               Navigator.pop(context);
               await DatabaseHelper()
-                  .deleteMyList(widget.inspection.id!);
+                  .deleteMyList(widget.inspection.id);
               Navigator.pop(context, true);
             },
             child: const Text("Yes"),

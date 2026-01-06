@@ -1,7 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_property_inspection/InspectionForm.dart';
 import 'package:smart_property_inspection/InspectionDetailScreen.dart';
+import 'package:smart_property_inspection/LoginScreen.dart';
 import 'package:smart_property_inspection/databasehelper.dart';
 import 'package:smart_property_inspection/inspectiondata.dart';
 
@@ -27,8 +30,10 @@ class _MainScreenState extends State<MainScreen> {
 
   // ================= LOAD DATA =================
   Future<void> loadData() async {
-    inspectionList =
-        await DatabaseHelper().getMyListsPaginated(limit, 0);
+    inspectionList = await DatabaseHelper().getMyListsPaginated(limit, 0);
+
+
+
     if (mounted) setState(() {});
   }
 
@@ -80,9 +85,9 @@ class _MainScreenState extends State<MainScreen> {
               final keyword = searchController.text.trim();
               if (keyword.isEmpty) return;
 
-              inspectionList =
-                  await DatabaseHelper().searchMyList(keyword);
+              inspectionList = await DatabaseHelper().searchMyList(keyword);
 
+              
               if (mounted) {
                 setState(() => isSearching = true);
                 Navigator.pop(context);
@@ -105,9 +110,7 @@ class _MainScreenState extends State<MainScreen> {
         onPressed: () async {
           await Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (_) => const InspectionFormPage(),
-            ),
+            MaterialPageRoute(builder: (_) => const InspectionFormPage()),
           );
           loadData();
         },
@@ -122,19 +125,47 @@ class _MainScreenState extends State<MainScreen> {
         ),
         child: Column(
           children: [
-            // HEADER
+            // ================= HEADER =================
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Property Inspections",
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF2F3E46),
-                    ),
+                  Row(
+                    children: [
+                      const Text(
+                        "Property Inspections",
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF2F3E46),
+                        ),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.logout,
+                          size: 22,
+                          color: Color(0xFF52796F),
+                        ),
+                        tooltip: "Logout",
+                        onPressed: () async {
+                          final prefs =
+                              await SharedPreferences.getInstance();
+                          await prefs.setBool('isLoggedIn', false);
+
+                          if (!mounted) return;
+
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const LoginScreen(),
+                            ),
+                            (route) => false,
+                          );
+                        },
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 6),
                   const Text(
@@ -142,13 +173,13 @@ class _MainScreenState extends State<MainScreen> {
                     style: TextStyle(color: Colors.black54),
                   ),
                   const SizedBox(height: 16),
-
-                  // SEARCH BAR
                   GestureDetector(
                     onTap: showSearchDialog,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 14),
+                        horizontal: 16,
+                        vertical: 14,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(18),
@@ -165,7 +196,6 @@ class _MainScreenState extends State<MainScreen> {
                       ),
                     ),
                   ),
-
                   if (isSearching)
                     TextButton(
                       onPressed: () {
@@ -179,7 +209,7 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ),
 
-            // LIST
+            // ================= LIST =================
             Expanded(
               child: inspectionList.isEmpty
                   ? _emptyState()
@@ -188,7 +218,7 @@ class _MainScreenState extends State<MainScreen> {
                           const EdgeInsets.symmetric(horizontal: 16),
                       itemCount: inspectionList.length,
                       itemBuilder: (context, index) {
-                        final item = inspectionList[index];
+                        final item = inspectionList[index]; // ✅ NORMAL
 
                         return GestureDetector(
                           onTap: () async {
@@ -200,10 +230,7 @@ class _MainScreenState extends State<MainScreen> {
                                 ),
                               ),
                             );
-
-                            if (result == true) {
-                              loadData();
-                            }
+                            if (result == true) loadData();
                           },
                           child: _inspectionCard(item),
                         );
@@ -218,9 +245,8 @@ class _MainScreenState extends State<MainScreen> {
 
   // ================= CARD =================
   Widget _inspectionCard(InspectionData item) {
-    final firstImage = item.photos.isNotEmpty
-        ? item.photos.split(",")[0]
-        : "";
+    final firstImage =
+        item.photos.isNotEmpty ? item.photos.split(",")[0] : "";
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -228,10 +254,7 @@ class _MainScreenState extends State<MainScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 10,
-          ),
+          BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 10),
         ],
       ),
       child: Row(
@@ -250,7 +273,6 @@ class _MainScreenState extends State<MainScreen> {
               padding: const EdgeInsets.all(14),
               child: Row(
                 children: [
-                  // IMAGE
                   ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: SizedBox(
@@ -260,8 +282,6 @@ class _MainScreenState extends State<MainScreen> {
                     ),
                   ),
                   const SizedBox(width: 12),
-
-                  // DETAILS
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -271,10 +291,12 @@ class _MainScreenState extends State<MainScreen> {
                             _ratingChip(item.rating),
                             const Spacer(),
                             IconButton(
-                              icon: const Icon(Icons.delete,
-                                  size: 18, color: Colors.red),
-                              onPressed: () =>
-                                  deleteDialog(item.id),
+                              icon: const Icon(
+                                Icons.delete,
+                                size: 18,
+                                color: Colors.red,
+                              ),
+                              onPressed: () => deleteDialog(item.id),
                             ),
                           ],
                         ),
@@ -289,11 +311,11 @@ class _MainScreenState extends State<MainScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          item.dateCreated,
-                          style: const TextStyle(
-                              fontSize: 13,
-                              color: Colors.black54),
-                        ),
+  DateFormat("dd MMM yyyy, hh:mm a")
+      .format(DateTime.parse(item.dateCreated)),
+  style: const TextStyle(fontSize: 13, color: Colors.black54),
+),
+                        
                       ],
                     ),
                   ),
@@ -332,8 +354,7 @@ class _MainScreenState extends State<MainScreen> {
       ),
       child: Text(
         rating,
-        style: TextStyle(
-            color: color, fontWeight: FontWeight.w600),
+        style: TextStyle(color: color, fontWeight: FontWeight.w600),
       ),
     );
   }
@@ -359,13 +380,14 @@ class _MainScreenState extends State<MainScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.home_work_outlined,
-              size: 90, color: Colors.grey),
+          Icon(Icons.home_work_outlined, size: 90, color: Colors.grey),
           SizedBox(height: 16),
           Text(
             "No inspection records",
             style: TextStyle(
-                fontSize: 20, fontWeight: FontWeight.bold),
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           SizedBox(height: 6),
           Text("Tap + to add a new inspection"),

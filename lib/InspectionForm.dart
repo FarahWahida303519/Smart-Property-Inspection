@@ -16,13 +16,16 @@ class InspectionFormPage extends StatefulWidget {
 }
 
 class _InspectionFormPageState extends State<InspectionFormPage> {
+  // ================= CONTROLLERS =================
   final TextEditingController nameController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
 
+  // ================= IMAGE =================
   final ImagePicker picker = ImagePicker();
   final List<File> images = [];
 
+  // ================= DATA =================
   String rating = "Good";
   double? latitude;
   double? longitude;
@@ -30,14 +33,18 @@ class _InspectionFormPageState extends State<InspectionFormPage> {
   InspectionData? editInspection;
   late String dateCreated;
 
+  // ================= INIT =================
   @override
   void initState() {
     super.initState();
-    dateCreated =
-        DateFormat("dd MMM yyyy, hh:mm a").format(DateTime.now());
-    _getLocation(); // ✅ device GPS
+
+    // ✅ ONLY FIX: store sortable ISO date (TEXT)
+    dateCreated = DateTime.now().toIso8601String();
+
+    _getLocation(); // auto-detect GPS
   }
 
+  // ================= EDIT MODE =================
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -52,6 +59,8 @@ class _InspectionFormPageState extends State<InspectionFormPage> {
       rating = args.rating;
       latitude = args.latitude;
       longitude = args.longitude;
+
+      // keep original date when editing
       dateCreated = args.dateCreated;
 
       images.clear();
@@ -63,22 +72,28 @@ class _InspectionFormPageState extends State<InspectionFormPage> {
     }
   }
 
+  // ================= UI =================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFEFF6F5),
       appBar: AppBar(
-        title: Text(editInspection == null
-            ? "New Inspection"
-            : "Update Inspection"),
+        title: Text(
+          editInspection == null ? "New Inspection" : "Update Inspection",
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         backgroundColor: const Color(0xFF52796F),
+        iconTheme: const IconThemeData(color: Colors.white),
+        elevation: 0,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
-            // PROPERTY NAME
             TextField(
               controller: nameController,
               decoration: const InputDecoration(
@@ -86,10 +101,7 @@ class _InspectionFormPageState extends State<InspectionFormPage> {
                 prefixIcon: Icon(Icons.home),
               ),
             ),
-
             const SizedBox(height: 12),
-
-            // ADDRESS
             TextField(
               controller: addressController,
               decoration: const InputDecoration(
@@ -97,20 +109,14 @@ class _InspectionFormPageState extends State<InspectionFormPage> {
                 prefixIcon: Icon(Icons.location_city),
               ),
             ),
-
             const SizedBox(height: 8),
-
-            // GPS DISPLAY
             Text(
               latitude == null
                   ? "Detecting GPS location..."
                   : "GPS: $latitude , $longitude",
               style: const TextStyle(color: Colors.black54),
             ),
-
             const SizedBox(height: 16),
-
-            // DESCRIPTION
             TextField(
               controller: descriptionController,
               maxLines: 4,
@@ -118,10 +124,7 @@ class _InspectionFormPageState extends State<InspectionFormPage> {
                 labelText: "Inspection Description",
               ),
             ),
-
             const SizedBox(height: 16),
-
-            // RATING
             DropdownButtonFormField<String>(
               value: rating,
               decoration: const InputDecoration(
@@ -135,10 +138,7 @@ class _InspectionFormPageState extends State<InspectionFormPage> {
               ],
               onChanged: (val) => setState(() => rating = val!),
             ),
-
             const SizedBox(height: 16),
-
-            // PHOTOS
             Text("Photos (${images.length}/3 minimum)"),
             const SizedBox(height: 6),
             Wrap(
@@ -153,18 +153,13 @@ class _InspectionFormPageState extends State<InspectionFormPage> {
                       ))
                   .toList(),
             ),
-
             const SizedBox(height: 8),
-
             ElevatedButton.icon(
               onPressed: showImageSourceDialog,
               icon: const Icon(Icons.add_a_photo),
               label: const Text("Add Photo"),
             ),
-
             const SizedBox(height: 20),
-
-            // SAVE
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -195,7 +190,7 @@ class _InspectionFormPageState extends State<InspectionFormPage> {
     });
   }
 
-  // ================= IMAGE PICK & CROP =================
+  // ================= IMAGE PICK =================
   void showImageSourceDialog() {
     showModalBottomSheet(
       context: context,

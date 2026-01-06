@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class InspectionData {
   int id;
   String propertyName;
@@ -21,6 +23,12 @@ class InspectionData {
     this.photos,
   );
 
+  // convert string into fromat date
+  DateTime get createdAt {
+    final format = DateFormat("dd MMM yyyy, hh:mm a");
+    return format.parse(dateCreated);
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -37,15 +45,15 @@ class InspectionData {
 
   factory InspectionData.fromMap(Map<String, dynamic> map) {
     return InspectionData(
-      map['id'] as int,
-      map['property_name'] as String,
-      map['address'] as String,
-      map['description'] as String,
-      map['rating'] as String,
-      map['latitude'] as double,
-      map['longitude'] as double,
-      map['date_created'] as String,
-      map['photos'] as String,
+      map['id'],
+      map['property_name'],
+      map['address'],
+      map['description'],
+      map['rating'],
+      map['latitude'],
+      map['longitude'],
+      map['date_created'],
+      map['photos'],
     );
   }
 }
