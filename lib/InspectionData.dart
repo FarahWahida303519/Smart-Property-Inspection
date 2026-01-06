@@ -1,5 +1,3 @@
-import 'package:intl/intl.dart';
-
 class InspectionData {
   int id;
   String propertyName;
@@ -23,11 +21,7 @@ class InspectionData {
     this.photos,
   );
 
-  // convert string into fromat date
-  DateTime get createdAt {
-    final format = DateFormat("dd MMM yyyy, hh:mm a");
-    return format.parse(dateCreated);
-  }
+  DateTime get createdAt => DateTime.parse(dateCreated);
 
   Map<String, dynamic> toMap() {
     return {
