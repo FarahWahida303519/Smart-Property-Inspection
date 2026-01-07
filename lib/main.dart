@@ -5,7 +5,7 @@ import 'package:smart_property_inspection/LoginScreen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 🔴 IMPORTANT: reset login state so LoginScreen is shown
+  //  reset login state so LoginScreen is shown
   final prefs = await SharedPreferences.getInstance();
   await prefs.setBool('isLoggedIn', false);
 
@@ -63,7 +63,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
-    // SPLASH DELAY → LOGIN SCREEN
+    // SPLASH DELAY to LOGIN SCREEN
     Future.delayed(const Duration(seconds: 4), () {
       if (!mounted) return;
 
@@ -123,7 +123,7 @@ class _SplashScreenState extends State<SplashScreen>
 
               const SizedBox(height: 10),
 
-              // SUBTITLE
+              
               const Text(
                 "Record inspections efficiently",
                 style: TextStyle(

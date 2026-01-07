@@ -100,7 +100,7 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  // ================= UI =================
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -328,7 +328,7 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  // ================= RATING CHIP =================
+  // ================= RATING PART=================
   Widget _ratingChip(String rating) {
     Color color;
     switch (rating) {

@@ -157,7 +157,7 @@ class _LoginScreenState extends State<LoginScreen>
 
                 const SizedBox(height: 14),
 
-                // 🔽 SIMPLE TEXT BUTTON (MATCH REGISTER STYLE)
+                // MATCH REGISTER 
                 TextButton(
                   onPressed: () {
                     Navigator.pushReplacement(
@@ -183,7 +183,7 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  // SINGLE USER LOGIN VALIDATION
+  //  LOGIN VALIDATION
   Future<void> _handleLogin() async {
     String inputUsername = usernameController.text.trim();
 

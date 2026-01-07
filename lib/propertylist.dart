@@ -6,7 +6,7 @@ class InspectionData {
   double latitude;
   double longitude;
   String dateCreated;
-  String photos; // comma-separated or JSON string
+  String photos; 
 
   InspectionData(
     this.id,
