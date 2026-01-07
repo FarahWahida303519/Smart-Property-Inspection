@@ -28,77 +28,6 @@ class _MainScreenState extends State<MainScreen> {
     loadData();
   }
 
-  // ================= LOAD DATA =================
-  Future<void> loadData() async {
-    inspectionList = await DatabaseHelper().getMyListsPaginated(limit, 0);
-
-
-
-    if (mounted) setState(() {});
-  }
-
-  // ================= DELETE DIALOG =================
-  void deleteDialog(int id) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Delete Inspection"),
-        content: const Text("This action cannot be undone."),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () async {
-              await DatabaseHelper().deleteMyList(id);
-              if (mounted) Navigator.pop(context);
-              loadData();
-            },
-            child: const Text("Delete"),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ================= SEARCH =================
-  void showSearchDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Search Inspection"),
-        content: TextField(
-          controller: searchController,
-          decoration: const InputDecoration(
-            hintText: "Property name, address or description",
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final keyword = searchController.text.trim();
-              if (keyword.isEmpty) return;
-
-              inspectionList = await DatabaseHelper().searchMyList(keyword);
-
-              
-              if (mounted) {
-                setState(() => isSearching = true);
-                Navigator.pop(context);
-              }
-            },
-            child: const Text("Search"),
-          ),
-        ],
-      ),
-    );
-  }
 
   
   @override
@@ -125,7 +54,7 @@ class _MainScreenState extends State<MainScreen> {
         ),
         child: Column(
           children: [
-            // ================= HEADER =================
+            
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
               child: Column(
@@ -209,7 +138,7 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ),
 
-            // ================= LIST =================
+            //LIST PROPERTY
             Expanded(
               child: inspectionList.isEmpty
                   ? _emptyState()
@@ -243,7 +172,7 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  // ================= CARD =================
+  //CARD 
   Widget _inspectionCard(InspectionData item) {
     final firstImage =
         item.photos.isNotEmpty ? item.photos.split(",")[0] : "";
@@ -328,7 +257,7 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  // ================= RATING PART=================
+  // RATING PART
   Widget _ratingChip(String rating) {
     Color color;
     switch (rating) {
@@ -359,7 +288,7 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  // ================= IMAGE =================
+  // IMAGE 
   Widget _loadImage(String path) {
     if (path.isEmpty) {
       return Container(
@@ -374,7 +303,7 @@ class _MainScreenState extends State<MainScreen> {
         : const Icon(Icons.broken_image);
   }
 
-  // ================= EMPTY STATE =================
+  // EMPTY STATE 
   Widget _emptyState() {
     return const Center(
       child: Column(
@@ -391,6 +320,78 @@ class _MainScreenState extends State<MainScreen> {
           ),
           SizedBox(height: 6),
           Text("Tap + to add a new inspection"),
+        ],
+      ),
+    );
+  }
+  
+  // TOLOAD DATA 
+  Future<void> loadData() async {
+    inspectionList = await DatabaseHelper().getMyListsPaginated(limit, 0);
+
+
+
+    if (mounted) setState(() {});
+  }
+
+  // DELETE DIALOG =
+  void deleteDialog(int id) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Delete Inspection"),
+        content: const Text("This action cannot be undone."),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () async {
+              await DatabaseHelper().deleteMyList(id);
+              if (mounted) Navigator.pop(context);
+              loadData();
+            },
+            child: const Text("Delete"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  //SEARCH 
+  void showSearchDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Search Inspection"),
+        content: TextField(
+          controller: searchController,
+          decoration: const InputDecoration(
+            hintText: "Property name, address or description",
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final keyword = searchController.text.trim();
+              if (keyword.isEmpty) return;
+
+              inspectionList = await DatabaseHelper().searchMyList(keyword);
+
+              
+              if (mounted) {
+                setState(() => isSearching = true);
+                Navigator.pop(context);
+              }
+            },
+            child: const Text("Search"),
+          ),
         ],
       ),
     );

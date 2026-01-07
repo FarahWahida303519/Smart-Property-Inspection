@@ -45,7 +45,7 @@ class DatabaseHelper {
     );
   }
 
-  // ================= INSERT =================
+  //  INSERT DATA
   Future<int> insertMyList(InspectionData inspection) async {
     final db = await database;
     final data = inspection.toMap();
@@ -53,7 +53,7 @@ class DatabaseHelper {
     return await db.insert(tablename, data);
   }
 
-  // ================= UPDATE =================
+  // UPDATE DATA
   Future<int> updateMyList(InspectionData inspection) async {
     final db = await database;
     return await db.update(

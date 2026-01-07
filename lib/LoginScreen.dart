@@ -41,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  // AUTO LOGIN
+ 
   Future<void> _loadPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     storedUsername = prefs.getString('username') ?? "";

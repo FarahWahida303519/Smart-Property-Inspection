@@ -16,16 +16,15 @@ class InspectionFormPage extends StatefulWidget {
 }
 
 class _InspectionFormPageState extends State<InspectionFormPage> {
-  // ================= CONTROLLERS =================
+ 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
 
-  // ================= IMAGE =================
+  // IMAGE 
   final ImagePicker picker = ImagePicker();
   final List<File> images = [];
 
-  // ================= DATA =================
   String rating = "Good";
   double? latitude;
   double? longitude;
@@ -33,18 +32,18 @@ class _InspectionFormPageState extends State<InspectionFormPage> {
   InspectionData? editInspection;
   late String dateCreated;
 
-  // ================= INIT =================
+ 
   @override
   void initState() {
     super.initState();
 
-    // ✅ ONLY FIX: store sortable ISO date (TEXT)
+    // TO store sortable ISO date (TEXT)SINCE DATE IN TEXT
     dateCreated = DateTime.now().toIso8601String();
 
     _getLocation(); // auto-detect GPS
   }
 
-  // ================= EDIT MODE =================
+  
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -72,14 +71,14 @@ class _InspectionFormPageState extends State<InspectionFormPage> {
     }
   }
 
-  // ================= UI =================
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFEFF6F5),
       appBar: AppBar(
         title: Text(
-          editInspection == null ? "New Inspection" : "Update Inspection",
+          editInspection == null ? "New Inspection" : "Update Inspection",//TO DETERMINE WHEN ITS OPEN THE FORM ETIHER FOR ADD NEW PROPERTY OR UPDATE NEW DATA 
           style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w600,
@@ -173,11 +172,11 @@ class _InspectionFormPageState extends State<InspectionFormPage> {
     );
   }
 
-  // ================= GPS =================
+  // GPS 
   Future<void> _getLocation() async {
     LocationPermission permission =
         await Geolocator.requestPermission();
-
+//PERMISSIONS TO ACCESS THE LOCATION 
     if (permission == LocationPermission.denied ||
         permission == LocationPermission.deniedForever) return;
 
@@ -190,7 +189,7 @@ class _InspectionFormPageState extends State<InspectionFormPage> {
     });
   }
 
-  // ================= IMAGE PICK =================
+  // IMAGE PICK 
   void showImageSourceDialog() {
     showModalBottomSheet(
       context: context,
@@ -238,7 +237,7 @@ class _InspectionFormPageState extends State<InspectionFormPage> {
     }
   }
 
-  // ================= SAVE =================
+  
   Future<void> saveInspection() async {
     if (nameController.text.trim().isEmpty ||
         addressController.text.trim().isEmpty ||
@@ -279,9 +278,9 @@ class _InspectionFormPageState extends State<InspectionFormPage> {
     );
 
     if (editInspection == null) {
-      await DatabaseHelper().insertMyList(inspection);
+      await DatabaseHelper().insertMyList(inspection);//TO INSERT A NEW DATA
     } else {
-      await DatabaseHelper().updateMyList(inspection);
+      await DatabaseHelper().updateMyList(inspection);//TO UPDATE THE NEW DETAILS IN PROPERTIES LIST
     }
 
     if (mounted) Navigator.pop(context);

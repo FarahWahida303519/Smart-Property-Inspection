@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// ================= SPLASH SCREEN =================
+//SPLASH SCREEN 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -111,7 +111,7 @@ class _SplashScreenState extends State<SplashScreen>
 
               const SizedBox(height: 30),
 
-              // TITLE
+              // TITLE APP
               const Text(
                 "Smart Property Inspection",
                 style: TextStyle(
@@ -134,7 +134,7 @@ class _SplashScreenState extends State<SplashScreen>
 
               const SizedBox(height: 35),
 
-              // LOADING
+              // LOADING PART
               const CircularProgressIndicator(
                 strokeWidth: 3,
                 color: Color(0xFF4CAF50),

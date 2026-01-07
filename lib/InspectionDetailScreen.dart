@@ -48,7 +48,8 @@ class _InspectionDetailScreenState extends State<InspectionDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ================= PROPERTY INFO =================
+
+            //  PROPERTY INFO 
             _card(
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -70,7 +71,7 @@ class _InspectionDetailScreenState extends State<InspectionDetailScreen> {
                   ),
                   const SizedBox(height: 14),
 
-                  // ✅ DATE FORMATTED HERE
+                  // DATE FORMATTED 
                   _infoRow(
                     Icons.access_time,
                     DateFormat("dd MMM yyyy, hh:mm a")
@@ -90,7 +91,7 @@ class _InspectionDetailScreenState extends State<InspectionDetailScreen> {
 
             const SizedBox(height: 14),
 
-            // ================= RATING =================
+            // RATING SECTION
             Container(
               padding:
                   const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
@@ -117,7 +118,7 @@ class _InspectionDetailScreenState extends State<InspectionDetailScreen> {
 
             const SizedBox(height: 24),
 
-            // ================= DESCRIPTION =================
+            //  DESCRIPTION PROPERTY
             const Text(
               "Inspection Description",
               style:
@@ -156,7 +157,7 @@ class _InspectionDetailScreenState extends State<InspectionDetailScreen> {
 
             const SizedBox(height: 28),
 
-            // ================= PHOTOS =================
+            //  PICTURE
             const Text(
               "Inspection Photos",
               style:
@@ -192,7 +193,7 @@ class _InspectionDetailScreenState extends State<InspectionDetailScreen> {
 
             const SizedBox(height: 30),
 
-            // ================= BUTTONS =================
+            // BUTTON
             Row(
               children: [
                 Expanded(
@@ -284,7 +285,7 @@ class _InspectionDetailScreenState extends State<InspectionDetailScreen> {
     );
   }
 
-  // ================= HELPERS =================
+ 
   Widget _card(Widget child) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -306,7 +307,7 @@ class _InspectionDetailScreenState extends State<InspectionDetailScreen> {
     );
   }
 
-  // ================= MAP =================
+  // TO OPEN MAP
   void openMap() async {
     final uri = Uri.parse(
       "geo:${widget.inspection.latitude},${widget.inspection.longitude}?q=${widget.inspection.latitude},${widget.inspection.longitude}",
@@ -322,7 +323,7 @@ class _InspectionDetailScreenState extends State<InspectionDetailScreen> {
     }
   }
 
-  // ================= DELETE =================
+  // DELETE 
   void confirmDelete(BuildContext context) {
     showDialog(
       context: context,
@@ -340,7 +341,7 @@ class _InspectionDetailScreenState extends State<InspectionDetailScreen> {
                 ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () async {
               Navigator.pop(context);
-              await DatabaseHelper()
+              await DatabaseHelper()//DELETE DATA FROM DB
                   .deleteMyList(widget.inspection.id);
               Navigator.pop(context, true);
             },
